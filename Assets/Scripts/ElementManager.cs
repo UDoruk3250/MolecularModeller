@@ -13,14 +13,13 @@ public class ElementManager : MonoBehaviour
         glow = transform.GetChild(1).gameObject;
     }
     void OnMouseOver(){
-        print(transform.name);
         isTouching = true;
         elementObject = gameObject;
         glow.GetComponent<MeshRenderer>().enabled = true;
 
     }
     void OnMouseExit(){
-
+        
         isTouching = false;
 
         glow.GetComponent<MeshRenderer>().enabled = false;

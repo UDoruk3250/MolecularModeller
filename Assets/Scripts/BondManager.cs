@@ -12,7 +12,11 @@ public class BondManager : MonoBehaviour
     private LineRenderer line;
     private LineRenderer line1;
     private LineRenderer line2;
+    private LineRenderer lineA;
+    private LineRenderer lineB;
+    private LineRenderer lineC;
     private GameObject DBond;
+    private GameObject TBond;
     private Vector3 mousePos;
     private Vector3 pos;
     public Material material;
@@ -40,9 +44,17 @@ public class BondManager : MonoBehaviour
                 Object.DestroyImmediate(line1.gameObject);
                 Object.DestroyImmediate(line2.gameObject);
             }
+            else if(lineA != null){
+                Object.DestroyImmediate(lineA.gameObject);
+                Object.DestroyImmediate(lineB.gameObject);
+                Object.DestroyImmediate(lineC.gameObject);
+            }
             line = null;
             line1 = null;
             line2 = null;
+            lineA = null;
+            lineB = null;
+            lineC = null;
         }
         //HIGHLIGHT
         // If mouse button is clicked:
@@ -79,6 +91,22 @@ public class BondManager : MonoBehaviour
                     line2.SetPosition(0, new Vector3(ElementManager.elementObject.transform.position.x, ElementManager.elementObject.transform.position.y - 10f, ElementManager.elementObject.transform.position.z + 1f));
                     line1.SetPosition(1, mousePos);
                     line2.SetPosition(1, mousePos);
+                }
+                else if(lineA == null  && lineB == null && lineC == null && (ButtonManager.selection == "TBondButton"))
+                {
+                    createTripleLine();
+                    pos = Input.mousePosition;
+                    pos.z = 841f; // 842f
+                    mousePos = Camera.main.ScreenToWorldPoint(pos);
+                    mousePos = new Vector3(mousePos.x, mousePos.y, mousePos.z + 15);
+                    startAtom = ElementManager.elementObject;
+                    lineA.SetPosition(0, new Vector3(ElementManager.elementObject.transform.position.x, ElementManager.elementObject.transform.position.y + 10f, ElementManager.elementObject.transform.position.z + 1f));
+                    lineB.SetPosition(0, new Vector3(ElementManager.elementObject.transform.position.x, ElementManager.elementObject.transform.position.y, ElementManager.elementObject.transform.position.z + 1f));
+                    lineC.SetPosition(0, new Vector3(ElementManager.elementObject.transform.position.x, ElementManager.elementObject.transform.position.y - 10f, ElementManager.elementObject.transform.position.z + 1f));
+
+                    lineA.SetPosition(1, mousePos);
+                    lineB.SetPosition(1, mousePos);
+                    lineC.SetPosition(1, mousePos);
                 }
 
                 //If the bond is done and the mouse has clicked on the second element:
@@ -120,18 +148,22 @@ public class BondManager : MonoBehaviour
 
                         if(startAtom.name == ElementManager.elementObject.name)
                         {
+                            Object.DestroyImmediate(DBond.gameObject);
                             Object.DestroyImmediate(line1.gameObject);
                             Object.DestroyImmediate(line2.gameObject);
                         }
                         else{
+                            distance = 10f;
                             // line1.SetPosition(1, mousePos + new Vector3(distance * Mathf.Cos(result), distance * Mathf.Sin(result + (45 * Mathf.PI)), 0f));
                             // line2.SetPosition(1, mousePos + new Vector3(distance * Mathf.Cos(result + (45 * Mathf.PI)), distance * Mathf.Sin(result), 0f));
                             float result = (Mathf.Atan((ElementManager.elementObject.transform.position.x - startAtom.transform.position.x)/((ElementManager.elementObject.transform.position.y - startAtom.transform.position.y))));
                             
                             line1.SetPosition(1, ElementManager.elementObject.transform.position + new Vector3(distance * Mathf.Cos(result), distance * Mathf.Sin(result + (45 * Mathf.PI)), 1f));
                             line2.SetPosition(1, ElementManager.elementObject.transform.position + new Vector3(distance * Mathf.Cos(result + (45 * Mathf.PI)), distance * Mathf.Sin(result), 1f));
-                                // line1.SetPosition(1, new Vector3(ElementManager.elementObject.transform.position.x, ElementManager.elementObject.transform.position.y + 15f, ElementManager.elementObject.transform.position.z + 1));
-                                // line2.SetPosition(1, new Vector3(ElementManager.elementObject.transform.position.x, ElementManager.elementObject.transform.position.y - 15f, ElementManager.elementObject.transform.position.z + 1));
+
+                            checkIfBondCross();
+                            // line1.SetPosition(1, new Vector3(ElementManager.elementObject.transform.position.x, ElementManager.elementObject.transform.position.y + 15f, ElementManager.elementObject.transform.position.z + 1));
+                            // line2.SetPosition(1, new Vector3(ElementManager.elementObject.transform.position.x, ElementManager.elementObject.transform.position.y - 15f, ElementManager.elementObject.transform.position.z + 1));
                             
                             // else
                             // {
@@ -151,6 +183,52 @@ public class BondManager : MonoBehaviour
                         line = null;
                         line1 = null;
                         line2 = null;
+                    }
+                    if(ButtonManager.selection == "TBondButton")
+                    {
+                        if(startAtom.name == ElementManager.elementObject.name)
+                        {
+                            Object.DestroyImmediate(TBond.gameObject);
+                            Object.DestroyImmediate(lineA.gameObject);
+                            Object.DestroyImmediate(lineB.gameObject);
+                            Object.DestroyImmediate(lineC.gameObject);
+                        }
+                        else
+                        {
+                            distance = 15f;
+                            // line1.SetPosition(1, mousePos + new Vector3(distance * Mathf.Cos(result), distance * Mathf.Sin(result + (45 * Mathf.PI)), 0f));
+                            // line2.SetPosition(1, mousePos + new Vector3(distance * Mathf.Cos(result + (45 * Mathf.PI)), distance * Mathf.Sin(result), 0f));
+                            float result = (Mathf.Atan((ElementManager.elementObject.transform.position.x - startAtom.transform.position.x)/((ElementManager.elementObject.transform.position.y - startAtom.transform.position.y))));
+                            
+                            lineA.SetPosition(1, ElementManager.elementObject.transform.position + new Vector3(distance * Mathf.Cos(result), distance * Mathf.Sin(result + (45 * Mathf.PI)), 1f));
+                            lineB.SetPosition(1, new Vector3(elementObject.transform.position.x, elementObject.transform.position.y, elementObject.transform.position.z + 1f));
+                            lineC.SetPosition(1, ElementManager.elementObject.transform.position + new Vector3(distance * Mathf.Cos(result + (45 * Mathf.PI)), distance * Mathf.Sin(result), 1f));
+                            checkIfBondCross();
+                                // line1.SetPosition(1, new Vector3(ElementManager.elementObject.transform.position.x, ElementManager.elementObject.transform.position.y + 15f, ElementManager.elementObject.transform.position.z + 1));
+                                // line2.SetPosition(1, new Vector3(ElementManager.elementObject.transform.position.x, ElementManager.elementObject.transform.position.y - 15f, ElementManager.elementObject.transform.position.z + 1));
+                            
+                            // else
+                            // {
+                            //     line2.SetPosition(1, ElementManager.elementObject.transform.position + new Vector3(distance * Mathf.Cos(result), distance * Mathf.Sin(result + (45 * Mathf.PI)), 0f));
+                            //     line1.SetPosition(1, ElementManager.elementObject.transform.position + new Vector3(distance * Mathf.Cos(result + (45 * Mathf.PI)), distance * Mathf.Sin(result), 0f));
+                            
+                            //     // line1.SetPosition(1, new Vector3(ElementManager.elementObject.transform.position.x, ElementManager.elementObject.transform.position.y - 15f, ElementManager.elementObject.transform.position.z + 1));
+                            //     // line2.SetPosition(1, new Vector3(ElementManager.elementObject.transform.position.x, ElementManager.elementObject.transform.position.y + 15f, ElementManager.elementObject.transform.position.z + 1));
+                            
+                            // }
+                            
+                            lineA.name = "TBondA." + "-" + currLines + "-" + startAtom.name + "-" + ElementManager.elementObject.name;
+                            lineB.name = "TBondB." + "-" + currLines + "-" + startAtom.name + "-" + ElementManager.elementObject.name;
+                            lineC.name = "TBondC." + "-" + currLines + "-" + startAtom.name + "-" + ElementManager.elementObject.name;
+                            TBond.name = "TBond" + "-" + currLines + "-" + startAtom.name + "-" + ElementManager.elementObject.name;
+                            currLines++;
+                        }
+                        line = null;
+                        line1 = null;
+                        line2 = null;
+                        lineA = null;
+                        lineB = null;
+                        lineC = null;
                     }
 
                 }
@@ -237,7 +315,7 @@ public class BondManager : MonoBehaviour
             }
         }
 
-        //HIGHLIGHT
+        //HIGHLIGHT 
         // If the mouse is not clicked and double bond is selected:
         // The mouse-following-bond-thing program 
 
@@ -247,6 +325,7 @@ public class BondManager : MonoBehaviour
             {
                 Vector3 pos = Input.mousePosition;
                 pos.z = 841f;
+                distance = 10f;
 
                 mousePos = Camera.main.ScreenToWorldPoint(pos);
                 float result = (Mathf.Atan((mousePos.x - startAtom.transform.position.x)/((mousePos.y - startAtom.transform.position.y))));
@@ -264,6 +343,34 @@ public class BondManager : MonoBehaviour
                 
                 line1.SetPosition(1, mousePos + new Vector3(distance * Mathf.Cos(result), distance * Mathf.Sin(result + (45 * Mathf.PI)), 0f));
                 line2.SetPosition(1, mousePos + new Vector3(distance * Mathf.Cos(result + (45 * Mathf.PI)), distance * Mathf.Sin(result), 0f));
+            }
+            
+        }
+        else if (!(Input.GetMouseButton(0)) && lineA != null && lineB != null && lineC != null)
+        {
+            if(ButtonManager.selection == "TBondButton")
+            {
+                Vector3 pos = Input.mousePosition;
+                pos.z = 841f;
+                distance = 15f;
+                mousePos = Camera.main.ScreenToWorldPoint(pos);
+                float result = (Mathf.Atan((mousePos.x - startAtom.transform.position.x)/((mousePos.y - startAtom.transform.position.y))));
+                
+
+                // line1.SetPosition(0, new Vector3(startAtom.transform.position.x + Xpoint ,startAtom.transform.position.y + Ypoint, mousePos.z + 10));
+                // line2.SetPosition(0, new Vector3(startAtom.transform.position.x - Xpoint ,startAtom.transform.position.y - Ypoint, mousePos.z + 10));
+                
+                lineA.SetPosition(0, startAtom.transform.position + new Vector3(distance * Mathf.Cos(result), distance * Mathf.Sin(result + (45 * Mathf.PI)), 1f));
+                lineB.SetPosition(0, new Vector3(startAtom.transform.position.x, startAtom.transform.position.y, 360f));
+                lineC.SetPosition(0, startAtom.transform.position + new Vector3(distance * Mathf.Cos(result + (45 * Mathf.PI)), distance * Mathf.Sin(result), 1f));
+                //line2.SetPosition(0, new Vector3(-1f * Xpoint , -1f * Ypoint, mousePos.z + 10));
+
+                // line1.SetPosition(1, new Vector3(mousePos.x, mousePos.y + 10f, mousePos.z + 10));
+                // line2.SetPosition(1, new Vector3(mousePos.x, mousePos.y - 10f, mousePos.z + 10));
+                
+                lineA.SetPosition(1, mousePos + new Vector3(distance * Mathf.Cos(result), distance * Mathf.Sin(result + (45 * Mathf.PI)), 0f));
+                lineB.SetPosition(1, mousePos);
+                lineC.SetPosition(1, mousePos + new Vector3(distance * Mathf.Cos(result + (45 * Mathf.PI)), distance * Mathf.Sin(result), 0f));
             }
             
         }
@@ -315,5 +422,67 @@ public class BondManager : MonoBehaviour
 
         line1.numCapVertices = 50;
         line2.numCapVertices = 50;
+    }
+    void createTripleLine()
+    {
+        TBond = new GameObject("TBond" + currLines);
+        lineA = new GameObject("TBondA." + currLines).AddComponent<LineRenderer>();
+        lineB = new GameObject("TBondB." + currLines).AddComponent<LineRenderer>();
+        lineC = new GameObject("TBondC." + currLines).AddComponent<LineRenderer>();
+
+        TBond.transform.parent = Bonds.transform;
+        TBond.transform.position = new Vector3(TBond.transform.position.x, TBond.transform.position.y, 1.001f);
+
+        lineA.transform.parent = TBond.transform;
+        lineB.transform.parent = TBond.transform;
+        lineC.transform.parent = TBond.transform;
+
+        lineA.material = material;
+        lineB.material = material;
+        lineC.material = material;
+
+        lineA.positionCount = 2;
+        lineB.positionCount = 2;
+        lineC.positionCount = 2;
+
+        lineA.startWidth = 10f;
+        lineB.startWidth = 10f;
+        lineC.startWidth = 10f;
+
+        lineA.endWidth = 10f;
+        lineB.endWidth = 10f;
+        lineC.endWidth = 10f;
+
+        lineA.useWorldSpace = false;
+        lineB.useWorldSpace = false;
+        lineC.useWorldSpace = false;
+
+        lineA.numCapVertices = 50;
+        lineB.numCapVertices = 50;
+        lineC.numCapVertices = 50;
+    }
+
+    void checkIfBondCross()
+    {
+        if(line1 != null && line2 != null)
+        {    
+            if((line2.GetPosition(1).y - line2.GetPosition(0).y) / (line2.GetPosition(1).x - line2.GetPosition(0).x != 0 ? line2.GetPosition(1).x - line2.GetPosition(0).x : 1 - (line1.GetPosition(1).y - line1.GetPosition(0).y) / (line1.GetPosition(1).x - line1.GetPosition(0).x != 0 ? line1.GetPosition(1).x - line1.GetPosition(0).x : 1)) > 0.1){
+                Vector3 tempPos;
+                tempPos = line1.GetPosition(1);
+                line1.SetPosition(1, line2.GetPosition(1));
+                line2.SetPosition(1, tempPos);
+                
+            }
+        }
+        if(lineA != null && lineB != null && lineC != null)
+        {
+            if((lineC.GetPosition(1).y - lineC.GetPosition(0).y) / (lineC.GetPosition(1).x - lineC.GetPosition(0).x != 0 ? lineC.GetPosition(1).x - lineC.GetPosition(0).x : 1) - (lineA.GetPosition(1).y - lineA.GetPosition(0).y) / (lineA.GetPosition(1).x - lineA.GetPosition(0).x != 0 ? lineA.GetPosition(1).x - lineA.GetPosition(0).x : 1)  > 0.1){
+                Vector3 tempPos;
+                tempPos = lineA.GetPosition(1);
+                lineA.SetPosition(1, lineC.GetPosition(1));
+                lineC.SetPosition(1, tempPos);
+            }
+        }
+
     }
 }

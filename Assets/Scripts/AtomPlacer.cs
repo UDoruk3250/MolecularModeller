@@ -74,11 +74,11 @@ public class AtomPlacer : MonoBehaviour
                     currAtom++;
 
                 }
-                else if((ElementManager.isTouching) && SelectedAtom.name != ElementManager.elementObject.name)
+                else if((ElementManager.isTouching) && (SelectedAtom.name != ElementManager.elementObject.name.Split('.')[0]))
                 {
                     GameObject ins = Instantiate(SelectedAtom, ElementManager.elementObject.transform.position, Quaternion.Euler(new Vector3(-90f, 0f, 0f)));
+                    ins.name = SelectedAtom.name + "." + (ElementManager.elementObject.name.Split('.')[1]).ToString();
                     DestroyImmediate(ElementManager.elementObject);
-                    ins.name = SelectedAtom.name + "." + (currAtom--).ToString();
                     ins.transform.parent = Atoms.transform;
                     currAtom++;
                 }
